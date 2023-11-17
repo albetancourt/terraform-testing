@@ -27,5 +27,5 @@ jobs:
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
           path=$(gh pr diff --name-only "${pr_branch}")
-          # cd infra/modules/module-01 && terraform test
-          ls infra/modules/module-01
+          cd infra/modules/module-01
+          ls
