@@ -12,7 +12,7 @@ provider "azurerm" {
 }
 
 module "website" {
-  source = "./modules/web"
+  source = "./web"
   providers = {
     azurerm = azurerm
   }
