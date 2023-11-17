@@ -23,4 +23,4 @@ jobs:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
-          gh pr diff "${pr_branch}"
+          gh pr diff --name-only "${pr_branch}"
