@@ -2,10 +2,11 @@ name: Terraform tests
 
 on:
   pull_request:
-    - opened
-    - reopened
-    - edited
-    - synchronize
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
 
 jobs:
   terraform-tests:
