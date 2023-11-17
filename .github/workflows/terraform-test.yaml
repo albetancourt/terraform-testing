@@ -21,4 +21,6 @@ jobs:
       - name: Terraform tests
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
-        run: echo "Hello World"
+        run: |
+          pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
+          echo "${pr_branch}"
