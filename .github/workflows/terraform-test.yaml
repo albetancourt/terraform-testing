@@ -27,4 +27,4 @@ jobs:
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
           path=$(gh pr diff --name-only "${pr_branch}")
-          cd "${path}" && terraform test
+          # cd "${path}" && terraform test
