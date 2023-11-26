@@ -1,0 +1,30 @@
+name: Terraform tests
+
+on:
+  workflow_call:
+    inputs:
+      working_directory:
+        description: "Directory from which tests should be run."
+        required: true
+        type: string
+
+jobs:
+  terraform-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          credentials_json: "${{ secrets.GOOGLE_CREDENTIALS }}"
+      - uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: "1.6.2"
+      - name: Terraform tests
+        working-directory: ${{ inputs.working_directory }}
+        run: terraform test -verbose
