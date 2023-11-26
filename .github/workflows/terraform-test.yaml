@@ -13,6 +13,8 @@ jobs:
     uses: albetancourt/terraform-testing/.github/workflows/tf-test-framework.yaml@branch-04
     with:
       working_directory: infra/modules/security/tests
+    secrets:
+      GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
     # env:
     #   GH_TOKEN: ${{ github.token }}
     # runs-on: ubuntu-latest
