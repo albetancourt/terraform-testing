@@ -28,5 +28,4 @@ jobs:
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
           path=$(gh pr diff --name-only "${pr_branch}")    
           root_folder="${PWD}"      
-          cd $root_folder/infra/modules/module-01 && terraform init && terraform test
-          cd $root_folder/infra/modules/module-03 && terraform init && terraform test
+          cd $root_folder/infra/modules/security && terraform init && terraform test
