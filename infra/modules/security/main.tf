@@ -18,11 +18,4 @@ resource "google_project_iam_audit_config" "default" {
   }
 
 
-
-
-
-
-
-
-
 }
