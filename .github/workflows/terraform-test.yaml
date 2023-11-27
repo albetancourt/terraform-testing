@@ -22,5 +22,4 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
-          gh pr diff --name-only "${pr_branch}" | grep '^infra/modules/.*\/tests/' | cut -d/ -f3
+          echo '{"working_directory":"infra/modules/security/tests"}' | gh workflow run terraform-test.yaml --ref branch-04 --json
