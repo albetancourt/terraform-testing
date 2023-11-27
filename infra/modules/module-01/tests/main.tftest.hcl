@@ -1,5 +1,5 @@
 variables {
-  config_url   = "https://example.com"
+  config_url   = "http://example.com"
   port         = 1414
   service_name = "my-service"
 }
