@@ -8,7 +8,7 @@ run "bad_input_url_should_fail" {
   command = plan
 
   variables {
-    config_url = "http://example.com"
+    config_url = "https://example.com"
   }
 
   expect_failures = [
