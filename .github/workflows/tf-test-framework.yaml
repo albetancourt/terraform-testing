@@ -32,6 +32,9 @@ jobs:
       - uses: hashicorp/setup-terraform@v2
         with:
           terraform_version: "1.6.2"
+      - name: Terraform init
+        working-directory: ${{ inputs.working_directory }}
+        run: terraform init
       - name: Terraform tests
         working-directory: ${{ inputs.working_directory }}
         run: terraform test -verbose
