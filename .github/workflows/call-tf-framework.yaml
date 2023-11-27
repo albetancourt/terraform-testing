@@ -34,5 +34,5 @@ jobs:
         run: |
           module_folders="${{ steps.get_module_folders.outputs.folders }}"
           while IFS= read -r line; do
-              echo "{\"working_directory\":\"$line\"}" 
+              echo "{\"working_directory\":\"$line\"}" | gh workflow run tf-test-framework.yaml --json
           done <<< "$module_folders"
