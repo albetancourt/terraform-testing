@@ -23,8 +23,4 @@ jobs:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
-          path=$(gh pr diff --name-only "${pr_branch}")
-          echo $path
-          # go test -v
-          # root_folder="${PWD}"
-          # cd $root_folder/infra/modules/security && terraform init && terraform test
+          gh pr diff --name-only "${pr_branch}" | grep '^infra/modules/.*\/tests/'
