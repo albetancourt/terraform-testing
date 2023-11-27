@@ -2,6 +2,11 @@ name: TfTestFramework
 
 on:
   workflow_dispatch:
+    inputs:
+      working_directory:
+        description: "Directory from which tests should be run."
+        required: true
+        type: string
 
   workflow_call:
     inputs:
