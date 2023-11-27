@@ -24,7 +24,7 @@ jobs:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
-          module_folders=$(gh pr diff --name-only "${pr_branch}" | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)          
+          module_folders=$(gh pr diff --name-only "${pr_branch}" | grep -oP '^((infra/modules/[^/]*)(?=/))|((services/[^/]*/modules/[^/]*)(?=/))' | sort | uniq)          
           {
           echo 'folders<<EOF'
           echo "$module_folders"
