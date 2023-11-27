@@ -22,4 +22,5 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          echo '{"working_directory":"infra/modules/security/tests"}' | gh workflow run terratest.yaml --json
+          pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
+          gh pr diff --name-only "${pr_branch}"
