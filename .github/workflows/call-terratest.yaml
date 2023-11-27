@@ -22,4 +22,4 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          echo '{"working_directory":"infra/modules/security"}' | gh workflow run tf-test-framework.yaml --json
+          echo '{"working_directory":"infra/modules/security/tests"}' | gh workflow run terratest.yaml --json
