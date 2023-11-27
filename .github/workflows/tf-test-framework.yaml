@@ -1,24 +1,15 @@
-name: TfTestFramework
+name: Terraform test framework
 
 on:
   workflow_dispatch:
     inputs:
       working_directory:
-        description: "Directory from which tests should be run."
-        required: true
-        type: string
-
-  workflow_call:
-    inputs:
-      working_directory:
-        description: "Directory from which tests should be run."
+        description: "Test Working Directory."
         required: true
         type: string
 
 jobs:
   terraform-tests:
-    env:
-      GH_TOKEN: ${{ github.token }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,6 +26,6 @@ jobs:
       - name: Terraform init
         working-directory: ${{ inputs.working_directory }}
         run: terraform init
-      - name: Terraform tests
+      - name: Terraform test
         working-directory: ${{ inputs.working_directory }}
         run: terraform test -verbose
