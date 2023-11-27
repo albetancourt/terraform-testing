@@ -10,6 +10,9 @@ infra/modules/module-01/main.tf
 EOF
 )
 
-MODULE_FOLDERS=$(echo "$GH_DIFF_OUTPUT" | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)
+# MODULE_FOLDERS=$(echo "$GH_DIFF_OUTPUT" | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)
 
-echo "$MODULE_FOLDERS"
+# echo "$MODULE_FOLDERS"
+
+MODULE_FOLDERS=$(gh pr diff --name-only 11 | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)
+echo "Modified module folders: $MODULE_FOLDERS"
