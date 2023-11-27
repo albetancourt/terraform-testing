@@ -33,8 +33,6 @@ jobs:
       - name: Run Terraform tests
         run: |
           module_folders="${{ steps.get_module_folders.outputs.folders }}"
-          echo $module_folders
-          # IFS=$'\n'
-          # for folder in "${module_folders[@]}"; do
-          #   echo "{\"working_directory\":\"$folder\"}" | gh workflow run tf-test-framework.yaml --json
-          # done
+          while IFS= read -r line; do
+              echo "{\"working_directory\":\"$line\"}" 
+          done <<< "$module_folders"
