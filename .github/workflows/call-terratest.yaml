@@ -33,6 +33,7 @@ jobs:
       - name: Run Terraform tests
         run: |
           module_folders="${{ steps.get_module_folders.outputs.folders }}"
-          for folder in "${module_folders[@]}"; do
-            echo $folder
-          done
+          echo $module_folders
+          # for folder in "${module_folders[@]}"; do
+          #   echo $folder
+          # done
