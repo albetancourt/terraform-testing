@@ -34,5 +34,5 @@ jobs:
         run: |
           module_folders="${{ steps.get_module_folders.outputs.folders }}"
           for folder in "${module_folders[@]}"; do
-            echo '{"working_directory":"$folder"}' | gh workflow run tf-test-framework.yaml --json
+            echo "{\"working_directory\":\"$folder\"}" | gh workflow run tf-test-framework.yaml --json
           done
