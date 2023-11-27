@@ -1,6 +1,8 @@
-name: Terraform tests
+name: TfTestFramework
 
 on:
+  workflow_dispatch:
+
   workflow_call:
     inputs:
       working_directory:

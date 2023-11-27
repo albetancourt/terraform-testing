@@ -1,8 +1,6 @@
 name: Terraform tests
 
 on:
-  workflow_dispatch:
-
   pull_request:
     types:
       - opened
@@ -24,5 +22,5 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          # echo '{"working_directory":"infra/modules/security/tests"}' | gh workflow run tf-test-framework.yaml --ref branch-04 --json
-          gh workflow list
+          echo '{"working_directory":"infra/modules/security/tests"}' | gh workflow run tf-test-framework.yaml --ref branch-04 --json
+          # gh workflow view ""
