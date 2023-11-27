@@ -1,0 +1,25 @@
+# name: Terraform tests
+
+# on:
+#   pull_request:
+#     types:
+#       - opened
+#       - reopened
+#       - edited
+#       - synchronize
+
+# jobs:
+#   terraform-tests:
+#     env:
+#       GH_TOKEN: ${{ github.token }}
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 1
+#       - name: Terraform tests
+#         env:
+#           GH_EVENT: ${{ toJSON(github.event) }}
+#         run: |
+#           echo '{"working_directory":"infra/modules/security"}' | gh workflow run tf-test-framework.yaml --json
