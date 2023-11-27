@@ -19,14 +19,14 @@ jobs:
         with:
           fetch-depth: 1
       - name: Get modified module folders
+        id: get_module_folders
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
           pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
           MODULE_FOLDERS=$(gh pr diff --name-only "${pr_branch}" | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)
           echo "Modified module folders: $MODULE_FOLDERS"
-          echo "module_folders=$MODULE_FOLDERS" >> "$GITHUB_OUTPUT"
-      # - name: Run Terraform tests
-      #   run: |
-      #     folders=${{terraform-tests.outputs.module_folders}}
-      #     echo "$folders"
+          echo "folders=$MODULE_FOLDERS" >> "$GITHUB_OUTPUT"
+      - name: Run Terraform tests
+        run: |
+          echo "${{ steps.get_module_folders.outputs.folders }}"
