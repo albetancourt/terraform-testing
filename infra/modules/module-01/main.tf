@@ -16,4 +16,5 @@ resource "local_file" "config" {
     "service": "${var.service_name}"
 }
 EOF
+
 }

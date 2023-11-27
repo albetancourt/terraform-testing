@@ -1,0 +1,38 @@
+name: Terraform tests
+
+on:
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - edited
+      - synchronize
+
+jobs:
+  terraform-tests:
+    env:
+      GH_TOKEN: ${{ github.token }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Get modified module folders
+        id: get_module_folders
+        env:
+          GH_EVENT: ${{ toJSON(github.event) }}
+        run: |
+          pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
+          module_folders=$(gh pr diff --name-only "${pr_branch}" | grep -oP '^((infra/modules/.*)(?=/))|((services/.*/modules/.*)(?=/))' | sort | uniq)          
+          {
+          echo 'folders<<EOF' >> $GITHUB_OUTPUT
+          echo "$module_folders" >> "$GITHUB_OUTPUT"
+          echo EOF 
+          } >> $GITHUB_OUTPUT
+      - name: Run Terraform tests
+        run: |
+          module_folders="${{ steps.get_module_folders.outputs.folders }}"
+          for folder in "${module_folders[@]}"; do
+            echo '{"working_directory":"$folder"}' | gh workflow run tf-test-framework.yaml --json
+          done
