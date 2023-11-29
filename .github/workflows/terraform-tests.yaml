@@ -25,10 +25,7 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} \
-          | grep -oP '^([^/]*/terraform/modules/[^/]*)(?=/)'
-          | sort \
-          | uniq)  
+          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} | grep -oP '^([^/]*/terraform/modules/[^/]*)(?=/)' | sort | uniq)  
           echo "$MODULE_FOLDERS"        
           {
           echo 'folders<<EOF'
