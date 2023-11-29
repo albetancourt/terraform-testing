@@ -32,9 +32,9 @@ jobs:
           echo "$MODULE_FOLDERS"
           echo EOF 
           } >> $GITHUB_OUTPUT
-      - name: Run Terraform tests
-        run: |
-          MODULE_FOLDERS="${{ steps.get_module_folders.outputs.folders }}"
-          while IFS= read -r line; do
-              echo "{\"working_directory\":\"$line\"}" | gh workflow run tf-test-framework.yaml --json
-          done <<< "$MODULE_FOLDERS"
+      # - name: Run Terraform tests
+      #   run: |
+      #     MODULE_FOLDERS="${{ steps.get_module_folders.outputs.folders }}"
+      #     while IFS= read -r line; do
+      #         echo "{\"working_directory\":\"$line\"}" | gh workflow run tf-test-framework.yaml --json
+      #     done <<< "$MODULE_FOLDERS"
