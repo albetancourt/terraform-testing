@@ -17,5 +17,4 @@ resource "google_project_iam_audit_config" "default" {
     log_type = "DATA_WRITE"
   }
 
-
 }
