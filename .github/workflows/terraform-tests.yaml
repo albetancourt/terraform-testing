@@ -23,7 +23,8 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} | grep -oP '^((infra/modules/[^/]*)(?=/))|((services/[^/]*/modules/[^/]*)(?=/))' | sort | uniq)          
+          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} | grep -oP '^((infra/modules/[^/]*)(?=/))|((services/[^/]*/modules/[^/]*)(?=/))' | sort | uniq)  
+          echo "$MODULE_FOLDERS"        
           {
           echo 'folders<<EOF'
           echo "$MODULE_FOLDERS"
