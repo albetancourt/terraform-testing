@@ -17,5 +17,4 @@ resource "local_file" "config" {
 }
 EOF
 
-
 }
