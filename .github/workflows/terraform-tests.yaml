@@ -23,16 +23,15 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          pr_branch=$(jq -r '.pull_request.head.ref' <<< "${GH_EVENT}")
-          module_folders=$(gh pr diff --name-only "${pr_branch}" | grep -oP '^((infra/modules/[^/]*)(?=/))|((services/[^/]*/modules/[^/]*)(?=/))' | sort | uniq)          
+          MODULE_FOLDERS=$(gh pr diff --name-only '.pull_request.number' | grep -oP '^((infra/modules/[^/]*)(?=/))|((services/[^/]*/modules/[^/]*)(?=/))' | sort | uniq)          
           {
           echo 'folders<<EOF'
-          echo "$module_folders"
+          echo "$MODULE_FOLDERS"
           echo EOF 
           } >> $GITHUB_OUTPUT
       - name: Run Terraform tests
         run: |
-          module_folders="${{ steps.get_module_folders.outputs.folders }}"
+          MODULE_FOLDERS="${{ steps.get_module_folders.outputs.folders }}"
           while IFS= read -r line; do
               echo "{\"working_directory\":\"$line\"}" | gh workflow run tf-test-framework.yaml --json
-          done <<< "$module_folders"
+          done <<< "$MODULE_FOLDERS"
