@@ -25,22 +25,16 @@ jobs:
         env:
           GH_EVENT: ${{ toJSON(github.event) }}
         run: |
-          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} | grep -oP '^([^/]*/terraform/modules/[^/]*)(?=/)' | sort | uniq)   
-
+          MODULE_FOLDERS=$(gh pr diff --name-only ${{ github.event.number }} | grep -oP '^([^/]*/terraform/modules/[^/]*)(?=/)' | sort | uniq)  
+          echo "$MODULE_FOLDERS"        
           {
           echo 'folders<<EOF'
           echo "$MODULE_FOLDERS"
           echo EOF 
           } >> $GITHUB_OUTPUT
-
       - name: Run Terraform tests
         run: |
           MODULE_FOLDERS="${{ steps.get_module_folders.outputs.folders }}"
-
-          while IFS= read -r folder; do
-            tests_dir="$folder/tests"
-            
-            if [ -d "$tests_dir" ]; then              
-              echo "{\"working_directory\":\"$tests_dir\"}" | gh workflow run terratest.yaml --json
-            fi
+          while IFS= read -r line; do
+              echo "{\"working_directory\":\"$line/tests\"}" | gh workflow run terratest.yaml --json
           done <<< "$MODULE_FOLDERS"
