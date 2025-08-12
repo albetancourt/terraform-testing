@@ -34,7 +34,7 @@ jobs:
           sort --unique)
 
           if [ -z "$changed_modules" ]; then
-          echo "No changed modules found in ${{ env.MODULES_PATH }}."
+            echo "No changed modules found in ${{ env.MODULES_PATH }}."
           fi
 
           {
@@ -43,26 +43,26 @@ jobs:
           echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-          - name: Filter for modules with a 'tests' subdirectory
-                  id: filter-modules
-                  run: |
+      - name: Filter for modules with a 'tests' subdirectory
+        id: filter-modules
+        run: |
           changed_modules="${{ steps.changed-modules.outputs.changed_modules }}"
 
           testable_modules=()
           for module in $changed_modules; do
-          if [ -d "$module/tests" ]; then
-          testable_modules+=("$module")
-          echo "Found tests for: $module"
-          else
-          echo "No tests for: $module"
-          fi
+            if [ -d "$module/tests" ]; then
+              testable_modules+=("$module")
+              echo "Found tests for: $module"
+            else
+              echo "No tests for: $module"
+            fi
           done
 
           # Format as JSON array for use in the next job's matrix
           if [ ${#testable_modules[@]} -eq 0 ]; then
-          json_array="[]"
+            json_array="[]"
           else
-          json_array=$(printf "%s\n" "${testable_modules[@]}" | jq -R . | jq -s -c .)
+            json_array=$(printf "%s\n" "${testable_modules[@]}" | jq -R . | jq -s -c .)
           fi
 
           echo "Testable modules found: ${json_array}"
