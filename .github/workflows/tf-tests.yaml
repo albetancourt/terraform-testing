@@ -37,21 +37,21 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # - name: Identify changed modules and submodules
-      #   id: changed-modules
-      #   run: |
-      #     changed_files="${{ steps.changed-files.outputs.changed_files }}"
+      - name: Identify changed modules and submodules
+        id: changed-modules
+        run: |
+          changed_files="${{ steps.changed-files.outputs.changed_files }}"
 
-      #     # Find unique directories under MODULES_PATH that changed
-      #     changed_dirs=$(echo "$changed_files" | grep "^${{ env.MODULES_PATH }}/" | xargs -r -n1 dirname | sort -u)
-      #     echo "Changed directories:"
-      #     echo "$changed_dirs"
+          # Find unique directories under MODULES_PATH that changed
+          changed_dirs=$(echo "$changed_files" | grep "^${{ env.MODULES_PATH }}/" | xargs -r -n1 dirname | sort -u)
+          echo "Changed directories:"
+          echo "$changed_dirs"
 
-      #     {
-      #       echo "changed_dirs<<EOF"
-      #       echo "$changed_dirs"
-      #       echo "EOF"
-      #     } >> "$GITHUB_OUTPUT"
+          {
+            echo "changed_dirs<<EOF"
+            echo "$changed_dirs"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       # - name: Find modules with a 'tests' subdirectory
       #   id: collect-testable
