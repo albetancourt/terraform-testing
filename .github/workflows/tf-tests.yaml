@@ -37,12 +37,12 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Identify changed modules and submodules
-        id: changed-modules
+      - name: Identify changed directories
+        id: changed-dirs
         run: |
           changed_files="${{ steps.changed-files.outputs.changed_files }}"
 
-          # Find unique directories under MODULES_PATH that changed
+          # List directories in MODULES_PATH that changed
           changed_dirs=$(echo "$changed_files" | grep "^${{ env.MODULES_PATH }}/" | xargs -r -n1 dirname | sort -u)
           echo "Changed directories:"
           echo "$changed_dirs"
