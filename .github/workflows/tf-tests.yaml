@@ -17,48 +17,63 @@ jobs:
     name: Find Testable Modules
     runs-on: ubuntu-latest
     outputs:
-      testable_modules: ${{ steps.filter-modules.outputs.testable_modules }}
+      testable_modules: ${{ steps.collect-testable.outputs.testable_modules }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Find changed modules
-        id: changed-modules
+      - name: Get list of changed files
+        id: changed-files
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # List top-level directories in MODULES_PATH changed in the PR
-          changed_modules=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | \
-          grep -oP '^(${{ env.MODULES_PATH }}/[^/]*)' |
-          sort --unique)
-
-          if [ -z "$changed_modules" ]; then
-            echo "No changed modules found in ${{ env.MODULES_PATH }}."
-          fi
-
+          changed_files=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | sort --unique)
+          echo "Changed files:"
+          echo "$changed_files"
           {
-          echo "changed_modules<<EOF"
-          echo "$changed_modules"
-          echo "EOF"
+            echo "changed_files<<EOF"
+            echo "$changed_files"
+            echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      - name: Filter for modules with a 'tests' subdirectory
-        id: filter-modules
+      - name: Identify changed modules and submodules
+        id: changed-modules
         run: |
-          changed_modules="${{ steps.changed-modules.outputs.changed_modules }}"
+          changed_files="${{ steps.changed-files.outputs.changed_files }}"
+
+          # Find unique directories under MODULES_PATH that changed
+          changed_dirs=$(echo "$changed_files" | grep "^${{ env.MODULES_PATH }}/" | xargs -r -n1 dirname | sort -u)
+          echo "Changed directories:"
+          echo "$changed_dirs"
+
+          {
+            echo "changed_dirs<<EOF"
+            echo "$changed_dirs"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Find modules with a 'tests' subdirectory
+        id: collect-testable
+        run: |
+          changed_dirs="${{ steps.changed-modules.outputs.changed_dirs }}"
 
           testable_modules=()
-          for module in $changed_modules; do
-            if [ -d "$module/tests" ]; then
-              testable_modules+=("$module")
-              echo "Found tests for: $module"
-            else
-              echo "No tests for: $module"
+
+          # For each changed directory, find any module (at any depth) with a 'tests' folder
+          for dir in $changed_dirs; do
+            found_modules=$(find "$dir" -type d -name tests -exec dirname {} \; | sort -u || true)
+            if [ -n "$found_modules" ]; then
+              while read -r module; do
+                [ -n "$module" ] && testable_modules+=("$module")
+              done <<< "$found_modules"
             fi
           done
 
-          # Format as JSON array for use in the next job's matrix
+          # Remove duplicates
+          testable_modules=($(printf "%s\n" "${testable_modules[@]}" | sort -u))
+
+          # Convert to JSON array for matrix
           if [ ${#testable_modules[@]} -eq 0 ]; then
             json_array="[]"
           else
@@ -68,36 +83,36 @@ jobs:
           echo "Testable modules found: ${json_array}"
           echo "testable_modules=${json_array}" >> "$GITHUB_OUTPUT"
 
-  # run-tests:
-  #   name: Test ${{ matrix.module }} (TF ${{ matrix.terraform-version }})
-  #   needs: find-testable-modules
-  #   if: needs.find-testable-modules.outputs.testable_modules != '[]'
-  #   runs-on: ubuntu-latest
+  run-tests:
+    name: Test ${{ matrix.module }} (TF ${{ matrix.terraform-version }})
+    needs: find-testable-modules
+    if: needs.find-testable-modules.outputs.testable_modules != '[]'
+    runs-on: ubuntu-latest
 
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       module: ${{ fromJson(needs.find-testable-modules.outputs.testable_modules) }}
-  #       terraform-version: ["1.12.1"]
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-testable-modules.outputs.testable_modules) }}
+        terraform-version: ["1.12.1"]
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3
-  #       with:
-  #         terraform_version: ${{ matrix.terraform-version }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ matrix.terraform-version }}
 
-  #     - name: Terraform Init
-  #       working-directory: ${{ matrix.module }}
-  #       run: |
-  #         echo "Initializing Terraform for module: ${{ matrix.module }}"
-  #         terraform init
+      - name: Terraform Init
+        working-directory: ${{ matrix.module }}
+        run: |
+          echo "Initializing Terraform for module: ${{ matrix.module }}"
+          terraform init
 
-  #     - name: Terraform Test
-  #       working-directory: ${{ matrix.module }}
-  #       continue-on-error: true
-  #       run: |
-  #         echo "Running tests for module: ${{ matrix.module }}"
-  #         terraform test
+      - name: Terraform Test
+        working-directory: ${{ matrix.module }}
+        continue-on-error: true
+        run: |
+          echo "Running tests for module: ${{ matrix.module }}"
+          terraform test
