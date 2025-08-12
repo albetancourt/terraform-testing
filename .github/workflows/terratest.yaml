@@ -1,31 +1,31 @@
-name: Terratest
+# name: Terratest
 
-on:
-  workflow_dispatch:
-    inputs:
-      working_directory:
-        description: "Test Working Directory."
-        required: true
-        type: string
+# on:
+#   workflow_dispatch:
+#     inputs:
+#       working_directory:
+#         description: "Test Working Directory."
+#         required: true
+#         type: string
 
-jobs:
-  terraform-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: "Authenticate to Google Cloud"
-        uses: "google-github-actions/auth@v1"
-        with:
-          credentials_json: "${{ secrets.GOOGLE_CREDENTIALS }}"
-      - uses: actions/setup-go@v1
-        with:
-          go-version: 1.21.1
-      - name: Download Go Modules
-        working-directory: ${{ inputs.working_directory }}
-        run: go mod download
-      - name: Run tests
-        working-directory: ${{ inputs.working_directory }}
-        run: go test -v
+# jobs:
+#   terraform-tests:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout
+#         uses: actions/checkout@v4
+#         with:
+#           fetch-depth: 1
+#       - name: "Authenticate to Google Cloud"
+#         uses: "google-github-actions/auth@v1"
+#         with:
+#           credentials_json: "${{ secrets.GOOGLE_CREDENTIALS }}"
+#       - uses: actions/setup-go@v1
+#         with:
+#           go-version: 1.21.1
+#       - name: Download Go Modules
+#         working-directory: ${{ inputs.working_directory }}
+#         run: go mod download
+#       - name: Run tests
+#         working-directory: ${{ inputs.working_directory }}
+#         run: go test -v

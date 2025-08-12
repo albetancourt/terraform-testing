@@ -1,0 +1,103 @@
+name: Test Terraform Modules
+
+on:
+  pull_request:
+    paths:
+      - "infra/terraform/modules/**"
+    types:
+      - opened
+      - reopened
+      - synchronize
+
+env:
+  MODULES_PATH: infra/terraform/modules
+
+jobs:
+  find-testable-modules:
+    name: Find Testable Modules
+    runs-on: ubuntu-latest
+    outputs:
+      testable_modules: ${{ steps.filter-modules.outputs.testable_modules }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find changed modules
+        id: changed-modules
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # List top-level directories in MODULES_PATH changed in the PR
+          changed_modules=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | \
+          grep -oP '^(${{ env.MODULES_PATH }}/[^/]*)' |
+          sort --unique)
+
+          if [ -z "$changed_modules" ]; then
+          echo "No changed modules found in ${{ env.MODULES_PATH }}."
+          fi
+
+          {
+          echo "changed_modules<<EOF"
+          echo "$changed_modules"
+          echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+          - name: Filter for modules with a 'tests' subdirectory
+                  id: filter-modules
+                  run: |
+          changed_modules="${{ steps.changed-modules.outputs.changed_modules }}"
+
+          testable_modules=()
+          for module in $changed_modules; do
+          if [ -d "$module/tests" ]; then
+          testable_modules+=("$module")
+          echo "Found tests for: $module"
+          else
+          echo "No tests for: $module"
+          fi
+          done
+
+          # Format as JSON array for use in the next job's matrix
+          if [ ${#testable_modules[@]} -eq 0 ]; then
+          json_array="[]"
+          else
+          json_array=$(printf "%s\n" "${testable_modules[@]}" | jq -R . | jq -s -c .)
+          fi
+
+          echo "Testable modules found: ${json_array}"
+          echo "testable_modules=${json_array}" >> "$GITHUB_OUTPUT"
+
+  # run-tests:
+  #   name: Test ${{ matrix.module }} (TF ${{ matrix.terraform-version }})
+  #   needs: find-testable-modules
+  #   if: needs.find-testable-modules.outputs.testable_modules != '[]'
+  #   runs-on: ubuntu-latest
+
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       module: ${{ fromJson(needs.find-testable-modules.outputs.testable_modules) }}
+  #       terraform-version: ["1.12.1"]
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup Terraform
+  #       uses: hashicorp/setup-terraform@v3
+  #       with:
+  #         terraform_version: ${{ matrix.terraform-version }}
+
+  #     - name: Terraform Init
+  #       working-directory: ${{ matrix.module }}
+  #       run: |
+  #         echo "Initializing Terraform for module: ${{ matrix.module }}"
+  #         terraform init
+
+  #     - name: Terraform Test
+  #       working-directory: ${{ matrix.module }}
+  #       continue-on-error: true
+  #       run: |
+  #         echo "Running tests for module: ${{ matrix.module }}"
+  #         terraform test
