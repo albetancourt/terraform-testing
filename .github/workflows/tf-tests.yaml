@@ -26,7 +26,14 @@ jobs:
       - name: Search for modules with a 'tests' subdirectory
         id: search-modules
         run: |
-          find ${{ env.MODULES_PATH }} -type d -name tests -exec dirname {} \; | sort --unique
+          testable_modules=$(find ${{ env.MODULES_PATH }} -type d -name tests -exec dirname {} \; | sort --unique)
+          echo "Testable modules:"
+          echo "$testable_modules"
+          {
+            echo "testable_modules<<EOF"
+            echo "$testable_modules"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       # - name: Get list of changed files
       #   id: changed-files
