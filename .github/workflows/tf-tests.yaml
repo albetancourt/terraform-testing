@@ -43,9 +43,6 @@ jobs:
             fi
           done
 
-          # Remove duplicates
-          modules_to_test=($(printf '%s\n' "${modules_to_test[@]}" | sort --unique))
-
           # Format as JSON array for use in the next job's matrix
           if [ ${#modules_to_test[@]} -eq 0 ]; then
             json_array="[]"
