@@ -56,6 +56,7 @@ jobs:
           testable_modules="${{ steps.testable-modules.outputs.testable_modules }}"
 
           changed_testable_modules=()
+
           for file in $changed_files; do
             for module in $testable_modules; do
               if [[ "$file" == *"$module/"* ]]; then
@@ -65,9 +66,10 @@ jobs:
             done
           done
 
+          changed_testable_modules=($(printf '%s\n' "${changed_testable_modules[@]}" | sort --unique))
+
           echo "Changed testable modules:"
           printf '%s\n' "${changed_testable_modules[@]}"
-
 
           {
             echo "changed_testable_modules<<EOF"
