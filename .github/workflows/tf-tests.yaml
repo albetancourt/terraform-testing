@@ -23,8 +23,22 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Search for modules with a 'tests' subdirectory
-        id: search-modules
+      - name: Get list of changed files
+        id: changed-files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          changed_files=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | sort --unique)
+          echo "Changed files:"
+          echo "$changed_files"
+          {
+            echo "changed_files<<EOF"
+            echo "$changed_files"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Get modules with a 'tests' subdirectory
+        id: testable-modules
         run: |
           testable_modules=$(find ${{ env.MODULES_PATH }} -type d -name tests -exec dirname {} \; | sort --unique)
           echo "Testable modules:"
@@ -35,19 +49,27 @@ jobs:
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
 
-      # - name: Get list of changed files
-      #   id: changed-files
-      #   env:
-      #     GH_TOKEN: ${{ github.token }}
-      #   run: |
-      #     changed_files=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | sort --unique)
-      #     echo "Changed files:"
-      #     echo "$changed_files"
-      #     {
-      #       echo "changed_files<<EOF"
-      #       echo "$changed_files"
-      #       echo "EOF"
-      #     } >> "$GITHUB_OUTPUT"
+      - name: Get testable modules that were changed in the PR
+        id: changed-testable-modules
+        run: |
+          changed_files="${{ steps.changed-files.outputs.changed_files }}"
+          testable_modules="${{ steps.testable-modules.outputs.testable_modules }}"
+
+          changed_testable_modules=()
+          for file in $changed_files; do
+            for module in $testable_modules; do
+              if grep -q "$module/" "$file"; then
+                changed_testable_modules+=("$module")
+                echo "Found changes in module: $module"
+              fi
+            done
+          done
+
+          {
+            echo "changed_testable_modules<<EOF"
+            echo "$changed_testable_modules"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       # - name: Identify changed directories
       #   id: changed-dirs
