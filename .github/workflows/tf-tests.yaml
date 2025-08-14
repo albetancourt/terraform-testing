@@ -17,7 +17,7 @@ jobs:
     name: Find Testable Modules
     runs-on: ubuntu-latest
     outputs:
-      testable_modules: ${{ steps.collect-testable.outputs.testable_modules }}
+      testable_modules: ${{ steps.changed-testable-modules.outputs.testable_modules }}
 
     steps:
       - name: Checkout repository
