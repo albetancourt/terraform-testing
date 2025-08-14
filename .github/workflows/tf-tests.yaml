@@ -58,7 +58,7 @@ jobs:
           changed_testable_modules=()
           for file in $changed_files; do
             for module in $testable_modules; do
-              if grep -q "$module/" "$file"; then
+              if [[ "$module/" == *"$file"* ]]; then
                 changed_testable_modules+=("$module")
                 echo "Found changes in module: $module"
               fi
