@@ -10,7 +10,7 @@ run "topic_name" {
     }
 
     assert {
-      condition = google_pubsub_topic.example.name == "example-topic"
+      condition = google_pubsub_topic.example.name == "my-topic"
       error_message = "Unexpected topic name"
     }
 }
