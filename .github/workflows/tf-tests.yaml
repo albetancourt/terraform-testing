@@ -65,6 +65,9 @@ jobs:
             done
           done
 
+          echo "Changed testable modules:"
+          echo "$changed_testable_modules"
+
           {
             echo "changed_testable_modules<<EOF"
             echo "$changed_testable_modules"
