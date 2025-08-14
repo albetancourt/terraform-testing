@@ -77,36 +77,36 @@ jobs:
           echo "Changed testable modules found: ${json_array}"
           echo "testable_modules=${json_array}" >> "$GITHUB_OUTPUT"
 
-  # run-tests:
-  #   name: Test ${{ matrix.module }} (TF ${{ matrix.terraform-version }})
-  #   needs: find-testable-modules
-  #   if: needs.find-testable-modules.outputs.testable_modules != '[]'
-  #   runs-on: ubuntu-latest
+  run-tests:
+    name: Test ${{ matrix.module }} (TF ${{ matrix.terraform-version }})
+    needs: find-testable-modules
+    if: needs.find-testable-modules.outputs.testable_modules != '[]'
+    runs-on: ubuntu-latest
 
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       module: ${{ fromJson(needs.find-testable-modules.outputs.testable_modules) }}
-  #       terraform-version: ["1.12.1"]
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-testable-modules.outputs.testable_modules) }}
+        terraform-version: ["1.12.1"]
 
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  #     - name: Setup Terraform
-  #       uses: hashicorp/setup-terraform@v3
-  #       with:
-  #         terraform_version: ${{ matrix.terraform-version }}
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ${{ matrix.terraform-version }}
 
-  #     - name: Terraform Init
-  #       working-directory: ${{ matrix.module }}
-  #       run: |
-  #         echo "Initializing Terraform for module: ${{ matrix.module }}"
-  #         terraform init
+      - name: Terraform Init
+        working-directory: ${{ matrix.module }}
+        run: |
+          echo "Initializing Terraform for module: ${{ matrix.module }}"
+          terraform init
 
-  #     - name: Terraform Test
-  #       working-directory: ${{ matrix.module }}
-  #       continue-on-error: true
-  #       run: |
-  #         echo "Running tests for module: ${{ matrix.module }}"
-  #         terraform test
+      - name: Terraform Test
+        working-directory: ${{ matrix.module }}
+        continue-on-error: true
+        run: |
+          echo "Running tests for module: ${{ matrix.module }}"
+          terraform test
