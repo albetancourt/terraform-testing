@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          # Get a list of files changed in the PR
+          # Files changed in the PR
           changed_files=$(gh pr diff --name-only ${{ github.event.pull_request.number }} | sort --unique)
 
           # Find all directories that contain a 'tests' sub-directory
@@ -43,7 +43,12 @@ jobs:
             fi
           done
 
-          json_array=$(printf "%s\n" "${modules_to_test[@]}" | jq -R . | jq -s -c .)
+          # Format as JSON array for use in the next job's matrix
+          if [ ${#modules_to_test[@]} -eq 0 ]; then
+            json_array="[]"
+          else
+            json_array=$(printf "%s\n" "${modules_to_test[@]}" | jq -R . | jq -s -c .)
+          fi
 
           echo "Modules to be tested: ${json_array}"
           echo "modules=${json_array}" >> "$GITHUB_OUTPUT"
