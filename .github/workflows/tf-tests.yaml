@@ -43,12 +43,7 @@ jobs:
             fi
           done
 
-          # Format as JSON array for use in the next job's matrix
-          if [ ${#modules_to_test[@]} -eq 0 ]; then
-            json_array="[]"
-          else
-            json_array=$(printf "%s\n" "${modules_to_test[@]}" | jq -R . | jq -s -c .)
-          fi
+          json_array=$(printf "%s\n" "${modules_to_test[@]}" | jq -R . | jq -s -c .)
 
           echo "Modules to be tested: ${json_array}"
           echo "modules=${json_array}" >> "$GITHUB_OUTPUT"
