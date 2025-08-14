@@ -1,4 +1,4 @@
-# 1
+# 2
 resource "google_pubsub_topic" "example" {
   name = "my-topic"
 }
