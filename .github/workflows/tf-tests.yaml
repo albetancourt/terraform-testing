@@ -52,7 +52,6 @@ jobs:
       - name: Get testable modules that were changed in the PR
         id: changed-testable-modules
         run: |
-          set -x
           changed_files="${{ steps.changed-files.outputs.changed_files }}"
           testable_modules="${{ steps.testable-modules.outputs.testable_modules }}"
 
