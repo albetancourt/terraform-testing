@@ -59,7 +59,7 @@ jobs:
           changed_testable_modules=()
           for file in $changed_files; do
             for module in $testable_modules; do
-              if [[ "$module/" == *"$file"* ]]; then
+              if [[ "$file" == *"$module/"* ]]; then
                 changed_testable_modules+=("$module")
                 echo "Found changes in module: $module"
               fi
